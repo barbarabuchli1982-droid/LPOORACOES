@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Quiz — Orações Coordenadas e Subordinadas (Módulo 14)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0f;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+:root{--c:#00e5ff;--g:#39ff14;--r:#ff4444;--y:#ffeb3b}
+
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+
+#hdr{background:linear-gradient(135deg,#001a20,#002a10);border-bottom:2px solid var(--c);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#hdr h1{font-size:.92rem;color:var(--c);flex:1;min-width:180px}
+#pb-wrap{flex:2;min-width:100px;height:7px;background:#1a2a2a;border-radius:4px}
+#pb{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--c),var(--g));transition:width .35s}
+#ctr{font-size:.82rem;color:#aaa;white-space:nowrap}
+
+#streak{position:fixed;top:62px;right:14px;background:linear-gradient(135deg,#ff6d00,#ff9800);border-radius:18px;padding:5px 13px;font-size:.78rem;font-weight:700;display:none;z-index:100;animation:pop .3s ease;box-shadow:0 0 10px #ff9800}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+#main{max-width:660px;margin:20px auto;padding:0 14px 40px}
+.card{background:#111827;border-radius:14px;border:1px solid #1e3a3a;padding:22px;box-shadow:0 4px 20px rgba(0,229,255,.06)}
+
+.qlabel{display:inline-block;background:linear-gradient(90deg,var(--c),var(--g));color:#000;font-size:.68rem;font-weight:700;border-radius:18px;padding:2px 11px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+.qsrc{color:#666;font-size:.72rem;margin-bottom:10px}
+.qtext{font-size:.97rem;line-height:1.65;color:#e0e0e0;margin-bottom:14px}
+.qtext b{color:var(--c)}
+.qtext u{text-decoration:underline;text-decoration-color:var(--g)}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:#0d1a1a;border:1.5px solid #1e3a3a;border-radius:9px;padding:11px 14px;cursor:pointer;font-size:.92rem;text-align:left;color:#ccc;display:flex;align-items:flex-start;gap:9px;transition:all .18s;width:100%}
+.opt:hover:not(.dis){border-color:var(--c);background:#0d2424;color:#fff;transform:translateX(2px)}
+.letter{min-width:24px;height:24px;border-radius:50%;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--c);flex-shrink:0;margin-top:1px}
+.opt.ok{border-color:var(--g);background:rgba(57,255,20,.1);color:#fff}
+.opt.ok .letter{background:var(--g);border-color:var(--g);color:#000}
+.opt.err{border-color:var(--r);background:rgba(255,68,68,.1);color:#fff}
+.opt.err .letter{background:var(--r);border-color:var(--r);color:#fff}
+.opt.dis{cursor:default}
+
+#exp{display:none;margin-top:14px;background:rgba(0,229,255,.07);border-left:3px solid var(--c);border-radius:0 8px 8px 0;padding:11px 14px;font-size:.88rem;line-height:1.6;color:#b0d8e0}
+#exp b{color:var(--g)}
+
+.btnrow{display:flex;justify-content:space-between;margin-top:16px;gap:10px}
+.btn{padding:10px 22px;border-radius:26px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;transition:all .18s}
+.btn-back{background:#1e3a3a;color:var(--c)}
+.btn-back:hover{background:#1e4a4a}
+.btn-next{background:linear-gradient(135deg,var(--c),var(--g));color:#000}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,229,255,.3)}
+.btn-next:disabled{opacity:.35;cursor:default;transform:none}
+
+#start{text-align:center;padding:36px 14px}
+#start h2{font-size:1.4rem;color:var(--c);margin-bottom:10px}
+#start p{color:#888;margin-bottom:24px;line-height:1.6}
+.btn-go{background:linear-gradient(135deg,var(--c),var(--g));color:#000;padding:13px 36px;font-size:1rem}
+
+#final{display:none;text-align:center;padding:28px 14px}
+.medal{font-size:4.5rem;margin:12px 0;animation:flt 3s ease-in-out infinite}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+#final h2{font-size:1.7rem;color:var(--c);margin-bottom:6px}
+#final p{color:#aaa;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:380px;margin:0 auto 22px}
+.stat{background:#111827;border:1px solid #1e3a3a;border-radius:11px;padding:14px 6px}
+.snum{font-size:1.5rem;font-weight:700;color:var(--g)}
+.slbl{font-size:.72rem;color:#666;margin-top:3px}
+.btn-re{background:linear-gradient(135deg,#ff6d00,#ff9800);color:#fff;padding:12px 30px}
+.btn-re:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(255,152,0,.35)}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div id="streak">🔥 <span id="snum">0</span> seguidas!</div>
+
+<div id="hdr">
+  <h1>📝 Orações Coordenadas e Subordinadas — Módulo 14</h1>
+  <div id="pb-wrap"><div id="pb" style="width:0%"></div></div>
+  <div id="ctr">0 / 28</div>
+</div>
+
+<div id="main">
+  <div id="start" class="card">
+    <h2>🎯 Quiz — Língua Portuguesa</h2>
+    <p>28 questões · Orações Coordenadas e Subordinadas Substantivas<br/>Dark neon · Gabarito explicado · 9º ano</p>
+    <button class="btn btn-go" onclick="startQuiz()">▶ Começar</button>
+  </div>
+
+  <div id="qscreen" style="display:none">
+    <div class="card">
+      <div class="qlabel" id="qlabel"></div>
+      <div class="qsrc" id="qsrc"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div id="exp"></div>
+      <div class="btnrow">
+        <button class="btn btn-back" id="btnback" onclick="goBack()">← Voltar</button>
+        <button class="btn btn-next" id="btnnext" disabled onclick="goNext()">Próxima →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="final" class="card">
+    <div class="medal" id="medal">🏆</div>
+    <h2 id="ftitle"></h2>
+    <p id="fscore"></p>
+    <div class="stats">
+      <div class="stat"><div class="snum" id="sc">0</div><div class="slbl">✅ Acertos</div></div>
+      <div class="stat"><div class="snum" id="sw">0</div><div class="slbl">❌ Erros</div></div>
+      <div class="stat"><div class="snum" id="ss">0</div><div class="slbl">🔥 Maior seq.</div></div>
+    </div>
+    <button class="btn btn-re" onclick="restart()">↩ Jogar Novamente</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS=[
+{
+  n:1,
+  src:"Coord. Q1",
+  text:`Qual alternativa exemplifica corretamente uma oração coordenada <b>alternativa</b>, indicando diferentes escolhas?`,
+  opts:["tanto estudar quanto se divertir", "seja descansar ou sair", "quer estudar, mas se divertir", "ora descansar, ora sair", "ir à praia e ao parque"],
+  ans:3,
+  exp:"\"Ora…ora\" é a conjunção alternativa clássica, indicando alternância entre duas possibilidades. \"Tanto…quanto\" é aditiva correlativa; \"mas\" é adversativa; \"e\" é aditiva."
+},
+{
+  n:2,
+  src:"Coord. Q2",
+  text:`Em uma coluna de jornal, o autor quer unir ideias que se <b>complementam sem dependência ou explicação</b>. Qual alternativa usa oração coordenada <b>aditiva</b>?`,
+  opts:["A cidade histórica encanta com suas fachadas centenárias porque o setor moderno destaca-se pela inovação arquitetônica.", "A cidade histórica encanta com suas fachadas centenárias, e o setor moderno destaca-se pela inovação arquitetônica.", "A cidade histórica encanta com suas fachadas centenárias, mas o setor moderno mostra como a inovação arquitetônica transforma o espaço.", "A cidade histórica encanta com suas fachadas centenárias, já que o setor moderno investe na inovação arquitetônica.", "A cidade histórica encanta com suas fachadas centenárias, o que faz o setor moderno destacar-se pela inovação arquitetônica."],
+  ans:1,
+  exp:"A conjunção \"e\" liga as duas orações de modo aditivo, sem relação de dependência, explicação ou oposição. \"Porque\" e \"já que\" indicam causa; \"mas\" indica oposição."
+},
+{
+  n:3,
+  src:"Coord. Q3",
+  text:`Qual alternativa ilustra adequadamente uma oração coordenada <b>conclusiva</b>, evidenciando relação de causa e efeito?`,
+  opts:["Ele estudou muito, mas não passou na prova.", "Ele estudou muito, porque passou na prova.", "Ele estudou muito, logo passou na prova.", "Ele estudou muito, porém passou na prova.", "Ele estudou muito, enquanto passou na prova."],
+  ans:2,
+  exp:"\"Logo\" é conjunção conclusiva por excelência: indica que a segunda oração é consequência lógica da primeira. \"Mas\" e \"porém\" são adversativas; \"porque\" é explicativa; \"enquanto\" é temporal."
+},
+{
+  n:4,
+  src:"Coord. Q4",
+  text:`Faço todos os trabalhos de casa de manhã, ___ fico com a tarde livre. A lacuna <b>não</b> pode ser substituída pela conjunção:`,
+  opts:["pois", "consequentemente", "logo", "assim", "contudo"],
+  ans:4,
+  exp:"\"Contudo\" é conjunção adversativa (= porém, mas) e não expressa conclusão/consequência. As demais — pois (conclusivo), consequentemente, logo e assim — indicam resultado e cabem perfeitamente no contexto."
+},
+{
+  n:5,
+  src:"Coord. Q5",
+  text:`Estudante 1: "Precisamos tomar medidas drásticas para combater o aquecimento global, <b>caso contrário</b>, sofreremos as consequências." Qual tipo de oração coordenada está presente?`,
+  opts:["Oração coordenada sindética adversativa", "Oração coordenada assindética", "Oração coordenada sindética explicativa", "Oração coordenada sindética conclusiva", "Oração coordenada sindética aditiva"],
+  ans:0,
+  exp:"\"Caso contrário\" funciona como locução conjuntiva adversativa, indicando oposição/contraste entre as duas orações. Há conjunção explícita (sindética) e o sentido é de contraste/condição adversa."
+},
+{
+  n:6,
+  src:"Coord. Q6",
+  text:`Analise: I. "Gosta de praia, <b>mas</b> também de montanha." / II. "Tem fome, <b>mas</b> não come direito." As conjunções transmitem a ideia de:`,
+  opts:["I: adição; II: oposição", "I: adição; II: conclusão", "I: explicação; II: oposição", "I: explicação; II: conclusão", "I: alternância; II: oposição"],
+  ans:0,
+  exp:"Em I, \"mas também\" tem valor aditivo (gosta de praia E também de montanha). Em II, \"mas\" tem valor adversativo/de oposição clássico (tem fome, porém não come direito)."
+},
+{
+  n:7,
+  src:"Coord. Q8",
+  text:`Assinale a sequência de conjunções correta para: 1. Correu demais, ... caiu. / 2. Dormiu mal, ... os sonhos não o deixaram em paz. / 3. A matéria perece, ... a alma é imortal. / 4. Leu o livro, ... é capaz de descrever as personagens. / 5. Guarde seus pertences, ... podem servir mais tarde.`,
+  opts:["porque, todavia, portanto, logo, entretanto", "por isso, porque, mas, portanto, que", "logo, porém, pois, porque, mas", "porém, pois, logo, todavia, porque", "entretanto, que, porque, pois, portanto"],
+  ans:1,
+  exp:"1. \"por isso\" (conclusiva: correu → caiu); 2. \"porque\" (explicativa: dormiu mal porque os sonhos...); 3. \"mas\" (adversativa: matéria ≠ alma); 4. \"portanto\" (conclusiva: leu → sabe descrever); 5. \"que\" (explicativa: guarde porque podem servir)."
+},
+{
+  n:8,
+  src:"Coord. Q9",
+  text:`Assinale a alternativa em que o período apresenta, <b>nesta ordem</b>, duas orações coordenadas seguidas de uma oração subordinada.`,
+  opts:["Estava cansado, deitou-se no sofá e adormeceu.", "Corremos para o carro, mas ele partiu.", "Ele terminou o trabalho, enviou o relatório, porque precisava cumprir o prazo.", "Maria chegou, cumprimentou os colegas e sentou-se.", "João leu o livro e gostou da história."],
+  ans:2,
+  exp:"\"Ele terminou o trabalho\" (1ª coord.) + \"enviou o relatório\" (2ª coord. assindética) + \"porque precisava cumprir o prazo\" (sub. adverbial causal). As demais têm apenas coordenadas."
+},
+{
+  n:9,
+  src:"Sub. Q1 — PUC-SP",
+  text:`Assinale a alternativa cuja oração subordinada é <b>substantiva predicativa</b>.`,
+  opts:["Espero que venhas hoje.", "O aluno que trabalha é bom.", "Meu desejo é que te formes logo.", "És tão inteligente como teu pai.", "n.d.a."],
+  ans:2,
+  exp:"\"Que te formes logo\" predica o sujeito \"meu desejo\" (equivale a: meu desejo = que te formes logo) → substantiva predicativa. Em (a), é objetiva direta; em (b), é adjetiva; em (d), é uma comparativa adverbial."
+},
+{
+  n:10,
+  src:"Sub. Q2 — FCE-SP",
+  text:`"Os homens sempre se esquecem <b>de que somos todos mortais</b>." A oração destacada é:`,
+  opts:["substantiva completiva nominal", "substantiva objetiva indireta", "substantiva predicativa", "substantiva objetiva direta", "substantiva subjetiva"],
+  ans:1,
+  exp:"O verbo \"esquecer-se\" exige complemento com preposição \"de\" → \"de que somos todos mortais\" é objetiva indireta. A preposição impede que seja OD; não há nome a complementar (não é completiva nominal)."
+},
+{
+  n:11,
+  src:"Sub. Q3 — UEL-PR",
+  text:`"Ninguém mais acreditava que ainda houvesse meios de salvá-lo." Há, no período acima:`,
+  opts:["três orações subordinadas.", "uma oração principal e uma subordinada.", "uma oração subordinada reduzida.", "uma oração subordinada subjetiva.", "uma oração subordinada objetiva indireta."],
+  ans:4,
+  exp:"O período tem: oração principal (\"Ninguém mais acreditava\") + oração subordinada substantiva que complementa \"acreditava\" + reduzida \"de salvá-lo\". A subordinada principal é objetiva indireta (acreditar em/que algo)."
+},
+{
+  n:12,
+  src:"Sub. Q4",
+  text:`"<b>Roy Foreman, irmão de George,</b> disse <b>que a causa da morte não era conhecida</b>." A correta análise sintática dos termos destacados, respectivamente, é:`,
+  opts:["Oração principal, aposto recapitulativo, oração subordinada substantiva subjetiva.", "Oração principal, vocativo, oração subordinada substantiva subjetiva.", "Vocativo, aposto, oração subordinada substantiva completiva nominal.", "Vocativo, aposto, oração subordinada substantiva apositiva.", "Sujeito oracional, aposto explicativo, oração subordinada substantiva objetiva direta."],
+  ans:4,
+  exp:"\"Roy Foreman, irmão de George\" = sujeito + aposto explicativo (\"irmão de George\" explica quem é Roy); \"que a causa da morte não era conhecida\" = objetiva direta do verbo \"disse\"."
+},
+{
+  n:13,
+  src:"Sub. Q5",
+  text:`A única alternativa que traz uma oração subordinada substantiva <b>subjetiva</b> é:`,
+  opts:["A minha vontade é que seja feliz.", "É essencial que você vença a partida.", "Todo ser humano precisa de paz.", "Tenho esperança de que as crianças sejam melhor educadas."],
+  ans:1,
+  exp:"\"É essencial que você vença\" — o verbo \"é essencial\" é impessoal, e \"que você vença\" funciona como sujeito da oração → substantiva subjetiva. Em (a), é predicativa; em (d), é completiva nominal."
+},
+{
+  n:14,
+  src:"Sub. Q6 — IMEPAC",
+  text:`A conjunção "e" geralmente expressa adição, mas nem sempre. Assinale a alternativa em que <b>não</b> tem ideia aditiva:`,
+  opts:["Chegou e entrou.", "Ela ia sair e choveu.", "Vivo alegre e sorridente.", "Lavou a esponja e o pincel."],
+  ans:1,
+  exp:"\"Ela ia sair e choveu\" — o \"e\" aqui tem valor adversativo (= mas; ela ia sair, mas choveu). As demais expressam adição verdadeira: (a) sequência de ações; (c) adjetivos somados; (d) dois objetos."
+},
+{
+  n:15,
+  src:"Sub. Q7",
+  text:`Relacionando as orações às suas classificações, qual sequência é correta para: a) Meu desejo é que haja paz. / b) Meu desejo é um só: que haja paz! / c) Convém que haja paz. / d) Necessito de que haja paz. / e) Eu acho que necessitamos de paz.`,
+  opts:["II, IV, I, V, III", "I, II, III, IV, V", "II, I, IV, III, V", "III, IV, I, II, V"],
+  ans:0,
+  exp:"a) predicativa (II) — predica \"meu desejo\"; b) apositiva (IV) — explica \"um só\"; c) subjetiva (I) — sujeito de \"convém\"; d) objetiva indireta (V) — complementa \"necessito de\"; e) objetiva direta (III) — complementa \"acho\"."
+},
+{
+  n:16,
+  src:"Sub. Q8 — UFPA",
+  text:`Qual período contém oração subordinada substantiva <b>predicativa</b>?`,
+  opts:["Meu desejo é que você passe nos exames vestibulares.", "Sou favorável a que o aprovem.", "Desejo-te isto: que sejas feliz.", "O aluno que estuda consegue superar as dificuldades do vestibular.", "Lembre-se de que tudo passa neste mundo."],
+  ans:0,
+  exp:"\"Que você passe nos exames\" predica o sujeito \"meu desejo\" → predicativa. Em (b), \"a que o aprovem\" é completiva nominal; em (c), \"que sejas feliz\" é apositiva; em (d), adjetiva; em (e), OI."
+},
+{
+  n:17,
+  src:"Sub. Q9 — FGV-SP",
+  text:`A oração sublinhada funciona como <b>sujeito</b> do verbo da oração principal em:`,
+  opts:["Não queria que José fizesse nenhum mal ao garoto.", "Não interessa <u>se o trem solta fumaça ou não</u>.", "As principais ações dependiam de que os componentes do grupo tomassem a iniciativa.", "Era uma vez um sapo que não comia moscas.", "Nossas esperanças eram que a viatura pudesse voltar a tempo de sair atrás do bandido."],
+  ans:1,
+  exp:"\"Não interessa\" — o verbo \"interessar\" é impessoal; \"se o trem solta fumaça ou não\" é o sujeito da oração → substantiva subjetiva. Em (a), é OD; em (c), OI; em (d), adjetiva; em (e), predicativa."
+},
+{
+  n:18,
+  src:"Sub. Q10 — FESP",
+  text:`"Lembro-me <b>de que ele só usava camisas brancas</b>." A oração em destaque é:`,
+  opts:["substantiva completiva nominal", "substantiva objetiva indireta", "substantiva predicativa", "substantiva subjetiva", "n.d.a."],
+  ans:1,
+  exp:"\"Lembrar-se de\" exige complemento com preposição \"de\" → \"de que ele só usava camisas brancas\" é objetiva indireta. Não há nome a completar (não é completiva nominal) e o sujeito é \"eu\" (explícito)."
+},
+{
+  n:19,
+  src:"Sub. Q12 — AOCP",
+  text:`Assinale a alternativa que apresenta <b>período composto</b>.`,
+  opts:["\"O relatório será mundialmente lançado hoje em Nova Délhi, na Índia, antes do Dia Mundial da Água.\"", "\"O relatório atribui a vários fatores a possível falta de água, entre eles, a intensa urbanização e a poluição.\"", "\"No Brasil, a preocupação com a falta de água ganhou destaque com a crise hídrica no Sudeste.\"", "\"Ary Mergulhão diz que o Brasil tem reserva de água importante.\""],
+  ans:3,
+  exp:"\"Ary Mergulhão diz\" (oração principal) + \"que o Brasil tem reserva de água importante\" (subordinada substantiva OD) = duas orações → período composto. As demais têm apenas um verbo (período simples)."
+},
+{
+  n:20,
+  src:"Sub. Q13b",
+  text:`Leia o texto de rede social: "Eu só te peço uma coisa: Não suma. Não me abandone. Não me esqueça, por favor."
+
+No período "Eu só te peço uma coisa: ___ não suma.", que conjunção poderia introduzir explicitamente a 2ª oração?`,
+  opts:["que", "porque", "mas", "se"],
+  ans:0,
+  exp:"\"Que\" é a conjunção integrante que introduz orações subordinadas substantivas. Ficaria: \"Eu só te peço uma coisa: que não suma.\" — a oração \"que não suma\" especifica/apõe \"uma coisa\"."
+},
+{
+  n:21,
+  src:"Sub. Q13c+d",
+  text:`No período "Eu só te peço uma coisa: que não suma.", a 2ª oração ("que não suma") desempenha qual função sintática e como se classifica?`,
+  opts:["Sujeito — oração subordinada substantiva subjetiva", "Objeto direto — oração subordinada substantiva objetiva direta", "Aposto — oração subordinada substantiva apositiva", "Predicativo — oração subordinada substantiva predicativa"],
+  ans:2,
+  exp:"\"Que não suma\" está em aposição a \"uma coisa\" (explica/especifica o OD) → função de aposto. Por isso é classificada como oração subordinada substantiva apositiva."
+},
+{
+  n:22,
+  src:"Cap.14 Q2 — S. Leopoldo",
+  text:`Uma oração subordinada pode ter função de objeto indireto. Assinale a alternativa que apresenta esse tipo de oração.`,
+  opts:["Ele me convenceu de que eu estava errada.", "Restou a saudade do que vivemos.", "Meu medo é que você não volte.", "Todos querem que você tenha sucesso profissional.", "É necessário que faças a cirurgia urgentemente."],
+  ans:0,
+  exp:"\"Convencer alguém de algo\" exige preposição \"de\" → \"de que eu estava errada\" é objetiva indireta. Em (c), é predicativa; em (d), OD; em (e), subjetiva; em (b), completiva nominal."
+},
+{
+  n:23,
+  src:"Cap.14 Q3 — Unichristus",
+  text:`Em "A verdade <b>é</b> que se detectou o foco original da pandemia na região de Wuhan, província de Hubei", o vocábulo "que" introduz uma oração:`,
+  opts:["coordenada assindética.", "coordenada sindética.", "subordinada substantiva apositiva.", "subordinada substantiva objetiva indireta.", "subordinada substantiva predicativa."],
+  ans:4,
+  exp:"\"A verdade é que se detectou…\" — \"que se detectou\" predica o sujeito \"A verdade\" → substantiva predicativa. É como dizer: \"A verdade é isso: que se detectou o foco em Wuhan.\""
+},
+{
+  n:24,
+  src:"Cap.14 Q4 — EsPCEx",
+  text:`"Existe um cinismo cada vez maior com relação à ciência, um senso <u>de que fomos traídos</u>, <u>de que promessas não foram cumpridas</u>". As orações sublinhadas são classificadas, respectivamente, como:`,
+  opts:["objetiva indireta / objetiva indireta", "subjetiva / subjetiva", "objetiva direta / objetiva indireta", "completiva nominal / completiva nominal", "completiva nominal / objetiva indireta"],
+  ans:3,
+  exp:"Ambas completam o nome \"senso\" (um senso de quê?) com preposição \"de\" → completivas nominais. Completiva nominal complementa um nome (substantivo ou adjetivo), não um verbo."
+},
+{
+  n:25,
+  src:"Cap.14 Q5 — PUC-GO",
+  text:`"dona Arginusa apareceu, tomou a joia, e após minucioso exame reconheceu <b>que era mesmo seu aquele broche de ouro e brilhantes</b>". A oração em negrito está corretamente classificada como:`,
+  opts:["Oração subordinada substantiva completiva nominal.", "Oração subordinada substantiva objetiva indireta.", "Oração subordinada substantiva apositiva.", "Oração subordinada substantiva objetiva direta."],
+  ans:3,
+  exp:"\"Reconheceu que era mesmo seu o broche\" — o verbo \"reconhecer\" exige objeto direto sem preposição; \"que era mesmo seu aquele broche\" é o OD → objetiva direta."
+},
+{
+  n:26,
+  src:"Cap.14 Q7 — FAG",
+  text:`Leia a crônica "Acorda, Menino!": "Duvida e se defende, dizendo que não chegaria a tanto. Queríamos não ter visto nem sabido — maldita imagem que, mesmo escorraçada da memória, dorme no tapete da sala."
+
+Assinale a alternativa cujo "que" introduz oração subordinada <b>substantiva</b>.`,
+  opts:["\"É lágrima que não pinga.\"", "\"É mais que um cadáver.\"", "\"Duvida e se defende, dizendo que não chegaria a tanto.\"", "\"maldita imagem que, mesmo escorraçada da memória, dorme no tapete da sala.\""],
+  ans:2,
+  exp:"\"Dizendo que não chegaria a tanto\" — \"que não chegaria a tanto\" é OD do gerúndio \"dizendo\" → substantiva objetiva direta. Em (a) e (d), \"que\" introduz adjetiva (modifica \"lágrima\"/\"imagem\"); em (b), \"que\" é preposição/comparativo."
+},
+{
+  n:27,
+  src:"Cap.14 Q8 — CCV-UFC",
+  text:`"É verdade <u>que eu, mais uma vez, errei o caminho</u>, e por isso nos metemos numa enrascada ainda maior." A oração sublinhada é:`,
+  opts:["subordinada substantiva objetiva direta", "subordinada substantiva subjetiva", "subordinada substantiva predicativa", "subordinada adjetiva explicativa"],
+  ans:1,
+  exp:"\"É verdade que eu errei\" — a expressão \"é verdade\" funciona como predicado nominal impessoal; \"que eu errei\" exerce a função de sujeito → substantiva subjetiva."
+},
+{
+  n:28,
+  src:"Cap.14 Q10 — PUC-SP",
+  text:`Em "Considerei, por fim, <u>que assim é o amor…</u>" a oração destacada tem, em relação à oração não destacada:`,
+  opts:["valor de substantivo e função sintática de objeto direto.", "valor de advérbio e função sintática de adjunto adverbial de modo.", "valor de substantivo e função sintática de sujeito.", "valor de adjetivo e função sintática de predicativo do sujeito."],
+  ans:0,
+  exp:"\"Considerei que assim é o amor\" — o verbo \"considerar\" exige OD; \"que assim é o amor\" é o objeto direto, com valor de substantivo (= considerei isso). → OD com valor substantivo."
+}
+];
+
+const state={cur:0,score:0,streak:0,best:0,wrong:0,answers:[]};
+const L=['a','b','c','d','e'];
+
+function startQuiz(){
+  document.getElementById('start').style.display='none';
+  document.getElementById('qscreen').style.display='block';
+  render(0);
+}
+
+function render(i){
+  const q=QUESTIONS[i];
+  const s=state.answers[i];
+  document.getElementById('qlabel').textContent='Questão '+q.n;
+  document.getElementById('qsrc').textContent=q.src;
+  document.getElementById('qtext').innerHTML=q.text.replace(/\n/g,'<br>');
+  const optsEl=document.getElementById('opts');
+  optsEl.innerHTML='';
+  q.opts.forEach((o,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='opt'+(s!==undefined?' dis':'');
+    btn.innerHTML=`<span class="letter">${L[idx]}</span><span>${o}</span>`;
+    if(s!==undefined){
+      if(idx===q.ans)btn.classList.add('ok');
+      else if(idx===s&&s!==q.ans)btn.classList.add('err');
+    } else {
+      btn.onclick=()=>choose(idx,q,i);
+    }
+    optsEl.appendChild(btn);
+  });
+  const expEl=document.getElementById('exp');
+  if(s!==undefined){expEl.innerHTML='💡 '+q.exp;expEl.style.display='block';}
+  else{expEl.style.display='none';}
+  document.getElementById('btnnext').disabled=(s===undefined);
+  document.getElementById('btnback').disabled=(i===0);
+  const pct=(i/QUESTIONS.length)*100;
+  document.getElementById('pb').style.width=pct+'%';
+  document.getElementById('ctr').textContent=(i+1)+' / '+QUESTIONS.length;
+}
+
+function choose(idx,q,i){
+  if(state.answers[i]!==undefined)return;
+  state.answers[i]=idx;
+  const ok=idx===q.ans;
+  if(ok){state.score++;state.streak++;state.best=Math.max(state.best,state.streak);}
+  else{state.wrong++;state.streak=0;}
+  updateStreak();
+  render(i);
+}
+
+function updateStreak(){
+  const b=document.getElementById('streak');
+  if(state.streak>=2){
+    let txt=state.streak>=5?'Lendário! 💥':state.streak>=3?'Hat-trick! 🔥🔥':'2 seguidas! 🔥';
+    document.getElementById('snum').textContent=txt;
+    b.style.display='block';
+  } else {b.style.display='none';}
+}
+
+function goNext(){
+  state.cur++;
+  if(state.cur>=QUESTIONS.length)showFinal();
+  else render(state.cur);
+}
+
+function goBack(){
+  if(state.cur>0){state.cur--;render(state.cur);}
+}
+
+function showFinal(){
+  document.getElementById('qscreen').style.display='none';
+  document.getElementById('final').style.display='block';
+  document.getElementById('pb').style.width='100%';
+  document.getElementById('ctr').textContent=QUESTIONS.length+' / '+QUESTIONS.length;
+  const pct=Math.round((state.score/QUESTIONS.length)*100);
+  document.getElementById('sc').textContent=state.score;
+  document.getElementById('sw').textContent=state.wrong;
+  document.getElementById('ss').textContent=state.best;
+  let m='📚',t='Continue Estudando!';
+  if(pct===100){m='🏆';t='Perfeito!';}
+  else if(pct>=90){m='🥇';t='Medalha de Ouro!';}
+  else if(pct>=70){m='🥈';t='Medalha de Prata!';}
+  else if(pct>=50){m='🥉';t='Medalha de Bronze!';}
+  document.getElementById('medal').textContent=m;
+  document.getElementById('ftitle').textContent=t;
+  document.getElementById('fscore').textContent=pct+'% de acerto — '+state.score+' de '+QUESTIONS.length+' questões';
+  if(pct>=70)confetti();
+}
+
+function restart(){
+  Object.assign(state,{cur:0,score:0,streak:0,best:0,wrong:0,answers:[]});
+  document.getElementById('streak').style.display='none';
+  document.getElementById('final').style.display='none';
+  document.getElementById('qscreen').style.display='block';
+  render(0);
+}
+
+function confetti(){
+  const cv=document.getElementById('confetti-canvas');
+  const ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const cols=['#00e5ff','#39ff14','#ffeb3b','#ff6d00','#ff4081','#fff'];
+  const ps=Array.from({length:140},()=>({
+    x:Math.random()*cv.width,y:Math.random()*cv.height-cv.height,
+    r:Math.random()*6+3,c:cols[Math.floor(Math.random()*cols.length)],
+    vx:(Math.random()-.5)*2.5,vy:Math.random()*3+1.5,a:Math.random()*360,sp:(Math.random()-.5)*4
+  }));
+  let f=0;
+  (function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a*Math.PI/180);
+      ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.sp;
+    });
+    if(++f<200)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+</script>
+</body>
+</html>
